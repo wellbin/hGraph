@@ -1,0 +1,28 @@
+{
+  "name": "hGraph",
+  "version": "1.0.0",
+  "homepage": "https://github.com/Antena/hGraph",
+  "authors": [
+    "Gonzalo Bellver <gonzalo@antena.co>"
+  ],
+  "description": "An open source javascript-based web application for visualizing health data",
+  "main": "HealthGraph.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "health",
+    "data",
+    "visualization",
+    "open",
+    "source"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
