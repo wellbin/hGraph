@@ -20,12 +20,9 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
-    "examples/*",
-    "lib/*",
-    "doc/*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
+    "examples",
+    "lib",
+    "docs",
+    "serverstart.sh"
   ]
 }
