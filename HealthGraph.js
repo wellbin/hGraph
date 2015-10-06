@@ -118,8 +118,6 @@
 		this.center      = 'translate(' + this.halfWidth + ',' + this.halfHeight + ')';
 		this.topleft     = 'translate(0,0)';
 
-		console.log(d3);        //TODO(gb): Remove trace!!!
-
 		this.scale       = d3.scale.linear().domain([-100,100]).range(this.scaleRange);
 
 		this.originCoords.x = this.halfWidth;
@@ -425,7 +423,6 @@
 
 			that.originCoords.x = moveDelta.x;
 			that.originCoords.y = moveDelta.y;
-			console.log('ted')
 		});
 
 		$(this.container).bind('mousedown',function(e){
@@ -591,7 +588,6 @@
 				zoomedScaleRange.push(that.scaleRange[i] * zoomFactor);
 			}
 			zoomedScale = d3.scale.linear().domain([-100,100]).range(zoomedScaleRange);
-			console.log(that.scaleRange);
 			zoomedRingPath = d3.svg.arc()
 				.startAngle(0)
 				.endAngle(360)
@@ -893,7 +889,7 @@
 
 		// Figure out where to place the point
 		angle = ((increment || this.primaryIncrement) * index) + (startingAngle || 0);
-		//console.log(angle);
+
 		radian = angle * (Math.PI / 180);
 
 		if ( startingDataValue ) {
@@ -1076,11 +1072,7 @@
 					sumSquares = sumSquares + (Math.pow(idealValue - score,2) * this.userdata.factors[factor].weight);
 				}
 			}
-			/*console.log('idealValue='+idealValue);
-			 console.log('numPoints='+numPoints);
-			 console.log('sumSquares='+sumSquares);
-			 console.log('score='+parseInt(100-(100/(Math.pow(100,2)*numPoints))*sumSquares));
-			 */
+
 			return parseInt(100-(100/(Math.pow(idealValue,2)*numPoints))*sumSquares);
 		}
 		return 50;
@@ -1111,7 +1103,6 @@
 		};
 
 		function loadGraph() {
-			console.log(opts);        //TODO(gb): Remove trace!!!
 			graph.initialize();
 		}
 
@@ -1119,7 +1110,6 @@
 			restrict: 'E',
 			link: function(scope, element, attrs) {
 				var metrics_url = attrs.metrics;
-				console.log(attrs);        //TODO(gb): Remove trace!!!
 				opts.width = attrs.width;
 				opts.height = attrs.height;
 				opts.container = element[0];
@@ -1140,8 +1130,7 @@
 						loadGraph();
 					},
 					function(response) {
-						console.log('ERROR');        //TODO(gb): Remove trace!!!
-						console.log(response);        //TODO(gb): Remove trace!!!
+						console.log('Error loading metrics data', response);
 					}
 				)
 			}
