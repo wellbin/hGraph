@@ -1109,9 +1109,10 @@
 		return {
 			restrict: 'E',
 			link: function(scope, element, attrs) {
-				var metrics_url = attrs.metrics;
-				opts.width = attrs.width;
-				opts.height = attrs.height;
+				var metrics_url = attrs.metrics,
+					parent = $(element[0].parentNode);
+				opts.width = parent.width();
+				opts.height = parent.width();
 				opts.container = element[0];
 				graph  = new HGraph(opts);
 
