@@ -1,4 +1,3 @@
-/*global d3: true */
 /*
  File: HGraph.js
 
@@ -13,6 +12,9 @@
  Ivan DiLernia <ivan@goinvo.com>
  Danny Hadley <danny@goinvo.com>
  Matt Madonna <matthew@myimedia.com>
+
+ Maintainers:
+ Gonzalo Bellver <gonzalo@antena.co>
 
  License:
  Copyright 2012, Involution Studios <http://goinvo.com>
@@ -64,9 +66,9 @@
 
 		// size of the ring relative to the image
 		this.scaleFactors = opts.scaleFactors || {
-				labels : { lower : 4, higher : 1.25},
-				nolabels : { lower : 3, higher : 1}
-			};
+					labels : { lower : 4, higher : 1.25},
+					nolabels : { lower : 3, higher : 1}
+				};
 
 		// true when a transition is in progress
 		this.transitioning = false;
@@ -112,8 +114,8 @@
 
 
 		this.scaleRange = this.showLabels ?
-			[this.halfHeight / this.scaleFactors.labels.lower, this.halfHeight / this.scaleFactors.labels.higher] :
-			[this.halfHeight / this.scaleFactors.nolabels.lower, this.halfHeight / this.scaleFactors.nolabels.higher];
+				[this.halfHeight / this.scaleFactors.labels.lower, this.halfHeight / this.scaleFactors.labels.higher] :
+				[this.halfHeight / this.scaleFactors.nolabels.lower, this.halfHeight / this.scaleFactors.nolabels.higher];
 
 		this.center      = 'translate(' + this.halfWidth + ',' + this.halfHeight + ')';
 		this.topleft     = 'translate(0,0)';
@@ -205,14 +207,14 @@
 	 */
 	HGraph.prototype.findClosestPoint = function(x, y){
 		halfWidth = $(this.context.node()).width()/2,
-			halfHeight = $(this.context.node()).height()/2,
-			distance = 9007199254740992,
-			closest = null;
+				halfHeight = $(this.context.node()).height()/2,
+				distance = 9007199254740992,
+				closest = null;
 
 		$('circle').each(function(){
 			var circleX = halfWidth + parseInt(d3.select(this).attr("cx")),
-				circleY = halfHeight + parseInt(d3.select(this).attr("cy")),
-				currentDistance = Math.abs(circleX - x) + Math.abs(circleY - y);
+					circleY = halfHeight + parseInt(d3.select(this).attr("cy")),
+					currentDistance = Math.abs(circleX - x) + Math.abs(circleY - y);
 			if(currentDistance < distance) {
 				distance = currentDistance;
 				closestDatapoint = this;
@@ -266,9 +268,9 @@
 
 
 		this.context     = d3.select(this.container)
-			.append('svg')
-			.attr('class','healthscore')
-			.attr('width',this.width).attr('height',this.height);
+				.append('svg')
+				.attr('class','healthscore')
+				.attr('width',this.width).attr('height',this.height);
 
 
 
@@ -276,19 +278,19 @@
 		for ( layer in this.layers ) {
 			if (this.layers.hasOwnProperty(layer)) {
 				this.layers[layer] = this.context.append('g')
-					.attr('class','layer')
-					.attr('data-layername', layer)
-					.attr('transform', this.center);
+						.attr('class','layer')
+						.attr('data-layername', layer)
+						.attr('transform', this.center);
 			}
 		}
 
 
 		// Draw the ring around the user's health score
 		this.ringpath = d3.svg.arc()
-			.startAngle(0)
-			.endAngle(360)
-			.innerRadius(this.scale(this.healthRange.lower))
-			.outerRadius(this.scale(this.healthRange.upper));
+				.startAngle(0)
+				.endAngle(360)
+				.innerRadius(this.scale(this.healthRange.lower))
+				.outerRadius(this.scale(this.healthRange.upper));
 
 		this.ring = this.layers.ring.append('path').attr('d', this.ringpath).classed('ring',true);
 
@@ -300,15 +302,15 @@
 		var scoreSize = this.layers.ring.node().getBBox().height/3.5;
 
 		this.overalltxt = this.layers.text.append('text')
-			.attr('class','overall')
-			.attr('font-size', scoreSize)
-			.text(this.calculateHealthScore());
+				.attr('class','overall')
+				.attr('font-size', scoreSize)
+				.text(this.calculateHealthScore());
 
 
 		// Center the score
 		this.overalltxt
-			.attr('x', - (this.overalltxt.node().getBBox().width / 2))
-			.attr('dy', '0.5ex');
+				.attr('x', - (this.overalltxt.node().getBBox().width / 2))
+				.attr('dy', '0.5ex');
 
 		// Figure out how many points there should be
 		this.primaryIncrement = 360 / this.userdata.factors.length || 1;
@@ -325,7 +327,7 @@
 		web = this.layers.web.append('path');
 		this.updateWeb(false);
 		web
-			.attr('data-originalPath', web.attr('d')).classed('web',true)
+				.attr('data-originalPath', web.attr('d')).classed('web',true)
 
 
 		// Set up the dragability of the zoomed in graph
@@ -348,24 +350,24 @@
 
 			// zoom-in pinch
 			touches.on('pinchout',
-				function() {
-					event.preventDefault();
-					if (that.isZoomedIn()) return;
-					// find closest datapoint to pinched area
-					var closestDatapoint = that.findClosestPoint(event.gesture.center.pageX,
-						event.gesture.center.pageY);
-					// determine coordinates that will represent the new center
-					var pathCenter = that.findSubsectionCenter(closestDatapoint);
-					that.zoomIn(that.zoomFactor, pathCenter.x, pathCenter.y);
-				}
+					function() {
+						event.preventDefault();
+						if (that.isZoomedIn()) return;
+						// find closest datapoint to pinched area
+						var closestDatapoint = that.findClosestPoint(event.gesture.center.pageX,
+								event.gesture.center.pageY);
+						// determine coordinates that will represent the new center
+						var pathCenter = that.findSubsectionCenter(closestDatapoint);
+						that.zoomIn(that.zoomFactor, pathCenter.x, pathCenter.y);
+					}
 			);
 
 			// zoom-out pinch
 			touches.on('pinchin',
-				function() {
-					event.preventDefault();
-					that.zoomOut();
-				}
+					function() {
+						event.preventDefault();
+						that.zoomOut();
+					}
 			);
 		}
 
@@ -534,9 +536,9 @@
 			if (this.layers.hasOwnProperty(key)) {
 				layer = this.layers[key];
 				layer.transition().ease('quad-out')
-					.duration(this.zoomTime * 0.8)
-					.each("end", function() { self.transitioning = false})
-					.attr('transform', translateToPoint(this.halfWidth - x, this.halfHeight - y));
+						.duration(this.zoomTime * 0.8)
+						.each("end", function() { self.transitioning = false})
+						.attr('transform', translateToPoint(this.halfWidth - x, this.halfHeight - y));
 			}
 		}
 	};
@@ -589,10 +591,10 @@
 			}
 			zoomedScale = d3.scale.linear().domain([-100,100]).range(zoomedScaleRange);
 			zoomedRingPath = d3.svg.arc()
-				.startAngle(0)
-				.endAngle(360)
-				.innerRadius(zoomedScale(that.healthRange.lower))
-				.outerRadius(zoomedScale(that.healthRange.upper));
+					.startAngle(0)
+					.endAngle(360)
+					.innerRadius(zoomedScale(that.healthRange.lower))
+					.outerRadius(zoomedScale(that.healthRange.upper));
 
 			return zoomedRingPath;
 		};
@@ -626,25 +628,25 @@
 				// Zoom the ring in.
 				if ( key === 'ring' ) {
 					layer.select('path')
-						.transition().ease('elastic')
-						.duration(this.zoomTime)
-						.attr('d', getZoomedRingPath());
+							.transition().ease('elastic')
+							.duration(this.zoomTime)
+							.attr('d', getZoomedRingPath());
 					// Do the datapoints
 				} else if ( key === 'datapoints') {
 					layer.selectAll('circle')
-						.transition().ease('elastic')
-						.duration(this.zoomTime)
-						.attr('cx', getZoomedX)
-						.attr('cy', getZoomedY);
+							.transition().ease('elastic')
+							.duration(this.zoomTime)
+							.attr('cx', getZoomedX)
+							.attr('cy', getZoomedY);
 
 					// And the labels
 					if (this.showLabels) {
 						labels = layer.selectAll('text');
 						labels
-							.transition().ease('elastic')
-							.duration(this.zoomTime)
-							.attr('x', getZoomedX)
-							.attr('y', getZoomedY);
+								.transition().ease('elastic')
+								.duration(this.zoomTime)
+								.attr('x', getZoomedX)
+								.attr('y', getZoomedY);
 
 
 						window.setTimeout(function(){
@@ -657,10 +659,10 @@
 
 				// Move it to the new origin point.
 				layer
-					.transition().ease('quad-out')
-					.duration(this.zoomTime * 0.8)
-					.each("end", function() { that.transitioning = false})
-					.attr('transform', translateToPoint(this.halfWidth - (this.x*zoomFactor), this.halfHeight - (this.y*zoomFactor)));
+						.transition().ease('quad-out')
+						.duration(this.zoomTime * 0.8)
+						.each("end", function() { that.transitioning = false})
+						.attr('transform', translateToPoint(this.halfWidth - (this.x*zoomFactor), this.halfHeight - (this.y*zoomFactor)));
 
 			}
 		}
@@ -684,14 +686,14 @@
 						(that.userdata.factors[i + 1] ? that.userdata.factors[i + 1] : that.userdata.factors[0]).score
 					];
 					that.addPoint(
-						details,
-						j + 1,
-						factor.angle,
-						(that.primaryIncrement / (factor.details.length + 1) || 1),
-						factor.details.length + 1,
-						scoreRange,
-						i,
-						true
+							details,
+							j + 1,
+							factor.angle,
+							(that.primaryIncrement / (factor.details.length + 1) || 1),
+							factor.details.length + 1,
+							scoreRange,
+							i,
+							true
 					);
 				}
 			}
@@ -709,10 +711,10 @@
 
 			// Animate them to their proper values
 			secondaryPoints
-				.transition().ease('elastic')
-				.duration(that.zoomTime)
-				.attr('cx', getZoomedX)
-				.attr('cy', getZoomedY);
+					.transition().ease('elastic')
+					.duration(that.zoomTime)
+					.attr('cx', getZoomedX)
+					.attr('cy', getZoomedY);
 
 			// And make the web follow suit
 			that.updateWeb();
@@ -774,28 +776,28 @@
 					// Zoom the ring out
 					if ( key === 'ring' ) {
 						layer.select('path')
-							.transition().ease('quad-in-out')
-							.duration(that.zoomTime)
-							.attr('d', that.ringpath);
+								.transition().ease('quad-in-out')
+								.duration(that.zoomTime)
+								.attr('d', that.ringpath);
 						// And the datapoints
 					} else if ( key === 'datapoints') {
 						// remove secondary points
 						layer.selectAll('.secondary').remove();
 
 						layer.selectAll('circle')
-							.transition().ease('quad-in-out')
-							.duration(that.zoomTime)
-							.attr('cx', getOriginalX)
-							.attr('cy', getOriginalY);
+								.transition().ease('quad-in-out')
+								.duration(that.zoomTime)
+								.attr('cx', getOriginalX)
+								.attr('cy', getOriginalY);
 
 						// And the labels
 						if ( that.showLabels ) {
 							layer.selectAll('text')
-								.transition().ease('quad-in-out')
-								.duration(that.zoomTime)
-								.text(setDetailText)
-								.attr('x', getOriginalX)
-								.attr('y', getOriginalY);
+									.transition().ease('quad-in-out')
+									.duration(that.zoomTime)
+									.text(setDetailText)
+									.attr('x', getOriginalX)
+									.attr('y', getOriginalY);
 						}
 					} else if ( key === 'web') {
 						that.updateWeb(true, true, true, 'quad-in-out');
@@ -803,10 +805,10 @@
 
 					// Move the layer back to the center
 					that.layers[key]
-						.transition().ease('quad-in')
-						.duration(that.zoomTime)
-						.each("end", function() {that.transitioning = false})
-						.attr('transform', that.center);
+							.transition().ease('quad-in')
+							.duration(that.zoomTime)
+							.each("end", function() {that.transitioning = false})
+							.attr('transform', that.center);
 				}
 			}
 			that.isZoomed = false;
@@ -909,13 +911,13 @@
 
 		radius = Math.max(1, Math.min(10, Math.round(this.width / 80)));
 		point = this.layers.datapoints.append('circle')
-			.data([datapoint.score])
-			.attr('r', secondary ? radius / 1.5 : radius)
-			.attr('cx', (startingCoords ? startingCoords.x : coords.x) * (this.isZoomedIn() ? this.zoomFactor : 1))
-			.attr('cy', (startingCoords ? startingCoords.y : coords.y) * (this.isZoomedIn() ? this.zoomFactor : 1))
-			.attr('data-origcoords', JSON.stringify(coords))
-			.attr('data-sortindex', typeof sortIndex === 'number' ? sortIndex + '.' + index : index)
-			.classed(getPointColor.call(this, scaledDataValue), true);
+				.data([datapoint.score])
+				.attr('r', secondary ? radius / 1.5 : radius)
+				.attr('cx', (startingCoords ? startingCoords.x : coords.x) * (this.isZoomedIn() ? this.zoomFactor : 1))
+				.attr('cy', (startingCoords ? startingCoords.y : coords.y) * (this.isZoomedIn() ? this.zoomFactor : 1))
+				.attr('data-origcoords', JSON.stringify(coords))
+				.attr('data-sortindex', typeof sortIndex === 'number' ? sortIndex + '.' + index : index)
+				.classed(getPointColor.call(this, scaledDataValue), true);
 
 		// allow point and zoom if graph is zoomable
 		if(this.zoomable) {
@@ -950,16 +952,16 @@
 			metricValue = datapoint.value || 100-Math.abs(datapoint.score);
 
 			label = this.layers.datapoints.append('text')
-				.text(datapoint.label + (labelWithDetail ? ' (' + metricValue + ')' : ''))
-				.data([datapoint.score])
-				.attr('class', 'label')
-				.attr('x', labelCoords.x)
-				.attr('y', labelCoords.y)
-				.attr('data-origcoords', JSON.stringify(labelCoords))
-				.attr('data-metricValue', datapoint.details ? '' : metricValue)
-				.attr('text-anchor', getTextAnchor(coords.x))
-				.attr('data-sortindex', typeof sortIndex === 'number' ? sortIndex + '.' + index : index)
-				.classed(getPointColor.call(this, scaledDataValue), true);
+					.text(datapoint.label + (labelWithDetail ? ' (' + metricValue + ')' : ''))
+					.data([datapoint.score])
+					.attr('class', 'label')
+					.attr('x', labelCoords.x)
+					.attr('y', labelCoords.y)
+					.attr('data-origcoords', JSON.stringify(labelCoords))
+					.attr('data-metricValue', datapoint.details ? '' : metricValue)
+					.attr('text-anchor', getTextAnchor(coords.x))
+					.attr('data-sortindex', typeof sortIndex === 'number' ? sortIndex + '.' + index : index)
+					.classed(getPointColor.call(this, scaledDataValue), true);
 
 			// allow point and zoom if graph is zoomable
 			if(this.zoomable) {
@@ -974,16 +976,16 @@
 			// Hook up a link if it's there.
 			if ( datapoint.link ) {
 				point
-					.attr('href', datapoint.link)
-					.classed('linked', true)
-					.on('click', gotoPage)
-					.on('touchend', gotoPage);
+						.attr('href', datapoint.link)
+						.classed('linked', true)
+						.on('click', gotoPage)
+						.on('touchend', gotoPage);
 
 				label
-					.attr('href', datapoint.link)
-					.classed('linked', true)
-					.on('click', gotoPage)
-					.on('touchend', gotoPage);
+						.attr('href', datapoint.link)
+						.classed('linked', true)
+						.on('click', gotoPage)
+						.on('touchend', gotoPage);
 			}
 
 			// Cascade the display of the labels.
@@ -1047,9 +1049,9 @@
 
 		if ( animated ) {
 			web
-				.transition().ease(easing)
-				.duration(this.zoomTime)
-				.attr('d', fillString);
+					.transition().ease(easing)
+					.duration(this.zoomTime)
+					.attr('d', fillString);
 		} else {
 			web.attr('d', fillString);
 		}
@@ -1058,6 +1060,10 @@
 	};
 
 
+	/**
+	 *
+	 * @returns {*}
+	 */
 	HGraph.prototype.calculateHealthScore = function(){
 		//V0.3 of hScore Algorithm.
 		if(this.userdata && this.userdata.factors){
@@ -1078,63 +1084,4 @@
 		return 50;
 	};
 
-
-	var app = angular.module('hGraph', []);
-
-	app.directive('hgraph', ['$http', function($http) {
-
-		var opts = {
-			container: null,
-			userdata: {
-				hoverevents : true,
-				factors: null
-			},
-			showLabels : true,
-			zoomable: true
-		};
-		var graph;
-
-		var randomBetween = function (min, max) {
-			if (min < 0) {
-				return min + Math.random() * (Math.abs(min)+max);
-			}else {
-				return min + Math.random() * max;
-			}
-		};
-
-		function loadGraph() {
-			graph.initialize();
-		}
-
-		return {
-			restrict: 'E',
-			link: function(scope, element, attrs) {
-				var metrics_url = attrs.metrics,
-					parent = $(element[0].parentNode);
-				opts.width = parent.width();
-				opts.height = parent.width();
-				opts.container = element[0];
-				graph  = new HGraph(opts);
-
-				$http.get(metrics_url).then(
-					function(response) {
-						var factors = response.data[0].metrics.map(function(metric) {
-							var value = randomBetween(metric.features.totalrange[0], metric.features.totalrange[1])
-							var score = graph.calculateScoreFromValue(metric.features, value);
-							return {
-								label: metric.name,
-								score: score,
-								value: value + ' ' + metric.features.unitlabel
-							}
-						});
-						opts.userdata.factors = factors;
-						loadGraph();
-					},
-					function(response) {
-						console.log('Error loading metrics data', response);
-					}
-				)
-			}
-		}
-	}]);
 })();
