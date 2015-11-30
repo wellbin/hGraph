@@ -13,7 +13,7 @@
  Danny Hadley <danny@goinvo.com>
  Matt Madonna <matthew@myimedia.com>
 
- Maintainers:
+ Contributors:
  Gonzalo Bellver <gonzalo@antena.co>
 
  License:
