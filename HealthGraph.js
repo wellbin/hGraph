@@ -60,6 +60,12 @@
             upper : 30
         };
 
+        // Features property names
+        opts.features = opts.features || {};
+        opts.features.healthyRange = opts.features.healthyRange || 'healthyrange';
+        opts.features.totalRange = opts.features.totalRange || 'totalrange';
+        this.features = opts.features;
+
         // enables/disables zooming
         this.zoomable = opts.zoomable || false;
 
@@ -498,10 +504,10 @@
      *      myValue - *(number)* Number to compare to features
      */
     HGraph.prototype.calculateScoreFromValue = function (features, myValue){
-        var maxHealthyValue = features.healthyrange[1];
-        var minHealthyValue = features.healthyrange[0];
-        var maxAcceptableValue = features.totalrange[1];
-        var minAcceptableValue = features.totalrange[0];
+        var maxHealthyValue = features[this.features.healthyRange][1];
+        var minHealthyValue = features[this.features.healthyRange][0];
+        var maxAcceptableValue = features[this.features.totalRange][1];
+        var minAcceptableValue = features[this.features.totalRange][0];
         var healthyRangeMidPoint = (minHealthyValue + maxHealthyValue)/2.0;
         var score = 0;
 
