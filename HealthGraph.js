@@ -59,6 +59,7 @@
             lower : -30,
             upper : 30
         };
+        console.log("this.rotation= " + this.rotation);     //TODO(gb): Remove trace!!!
 
         // Features property names
         opts.features = opts.features || {};
@@ -139,7 +140,7 @@
         this.originCoords.x = this.halfWidth;
         this.originCoords.y = this.halfHeight;
 
-    }
+    };
 
     /**
      *  Function: HGraph.redraw
@@ -157,7 +158,7 @@
             this.destroy();
             this.initialize();
         }
-    }
+    };
 
     /**
      *  Function: HGraph.destroy
@@ -165,7 +166,7 @@
      */
     HGraph.prototype.destroy = function() {
         this.context.remove();
-    }
+    };
 
     /**
      * Functon: HGraph.zeroGraph
@@ -178,7 +179,7 @@
             this.userdata.factors[key].weight = 1;
         }
         this.redraw();
-    }
+    };
 
     /**
      * Function: HGraph.updatePoint
@@ -194,7 +195,7 @@
             this.userdata.factors[id][key] = json[key];
         }
         this.redraw();
-    }
+    };
 
     /**
      * Function: HGraph.getIdByLabel
@@ -209,7 +210,7 @@
                 return id
         }
         return -1
-    }
+    };
 
     /**
      * Function: HGraph.findClosestPoint
@@ -236,7 +237,7 @@
         });
 
         return closestDatapoint;
-    }
+    };
 
 
     /**
@@ -264,7 +265,7 @@
             y : Math.sin(angle) * optimalRadius.toFixed(1)*this.zoomFactor
         };
 
-    }
+    };
 
     /**
      *  Function: HGraph.initialize
@@ -341,7 +342,8 @@
         web = this.layers.web.append('path');
         this.updateWeb(false);
         web
-            .attr('data-originalPath', web.attr('d')).classed('web',true)
+            .attr('data-originalPath', web.attr('d'))
+            .classed('web',true);
 
 
         // Set up the dragability of the zoomed in graph
@@ -518,17 +520,17 @@
                 score = 30 * ((myValue - healthyRangeMidPoint)/(maxHealthyValue - healthyRangeMidPoint))
             }
         } else if (myValue > maxHealthyValue){
-            score = 70 * ((myValue-maxHealthyValue)/(maxAcceptableValue-maxHealthyValue)) + 30
+            score = 70 * ((myValue-maxHealthyValue)/(maxAcceptableValue-maxHealthyValue)) + 30;
             if(score > 100)
                 score = 100;
         } else {
-            score = -(70 * ((minHealthyValue-myValue)/(minHealthyValue-minAcceptableValue)) + 30)
+            score = -(70 * ((minHealthyValue-myValue)/(minHealthyValue-minAcceptableValue)) + 30);
             if (score < -100)
                 score = -100;
         }
 
         return score;
-    }
+    };
 
     /**
      *  Function: HGraph.panTo
@@ -842,6 +844,20 @@
     };
 
     /**
+     * Function: addFactor
+     *      Adds a factor to the graph and redraws
+     *
+     * Arguments:
+     *      factor - *(Object)* A factor with the score, label, value and weight properties.
+     *
+     * Reutrn
+     */
+    HGraph.prototype.addFactor = function(factor) {
+        this.userdata.factors.push(factor);
+        this.redraw();
+    };
+
+    /**
      *  Function: addPoint
      *     Adds a data point to the graph
      *
@@ -860,7 +876,7 @@
      */
     HGraph.prototype.addPoint = function(datapoint, index, startingAngle, increment, steps, startingScoreRange, sortIndex, labelWithDetail) {
 
-        var point, secondary, angle, coords, radius, getPointColor, getTextAnchor, gotoPage, interstitialScore, startingDataValue, startingCoords, scoreDiff, scaledDataValue, labelPointScale, metricValue;
+        var point, secondary, angle, radian, coords, radius, getPointColor, getTextAnchor, gotoPage, interstitialScore, startingDataValue, startingCoords, scoreDiff, scaledDataValue, labelPointScale, metricValue;
 
         var self = this;
 
@@ -904,7 +920,7 @@
         }
 
         // Figure out where to place the point
-        angle = ((increment || this.primaryIncrement) * index) + (startingAngle || 0);
+        angle = ((increment || this.primaryIncrement) * index) + (startingAngle || 0) + this.rotation;
 
         radian = angle * (Math.PI / 180);
 
