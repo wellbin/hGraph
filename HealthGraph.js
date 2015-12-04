@@ -59,7 +59,6 @@
             lower : -30,
             upper : 30
         };
-        console.log("this.rotation= " + this.rotation);     //TODO(gb): Remove trace!!!
 
         // Features property names
         opts.features = opts.features || {};
@@ -88,7 +87,6 @@
         // true when a transition is in progress
         this.transitioning = false;
 
-
         this.halfWidth        = 0;
         this.halfHeight       = 0;
 
@@ -110,8 +108,25 @@
             ring       : null,
             web        : null,
             text       : null,
-            datapoints : null
+            datapoints : null,
+            help       : null
         };
+
+        // Help overlays visibility
+        this.helpOverlays = {
+            lower: {
+                node: null,
+                visible: false
+            },
+            center: {
+                node: null,
+                visible: false
+            },
+            upper: {
+                node: null,
+                visible: false
+            }
+        }
     };
 
 
@@ -279,15 +294,10 @@
 
         this.updateDimensions();
 
-
-
-
-        this.context     = d3.select(this.container)
+        this.context = d3.select(this.container)
             .append('svg')
             .attr('class','healthscore')
             .attr('width',this.width).attr('height',this.height);
-
-
 
         // Set up the layers
         for ( layer in this.layers ) {
@@ -309,23 +319,58 @@
 
         this.ring = this.layers.ring.append('path').attr('d', this.ringpath).classed('ring',true);
 
-
-
-        // and the score itself
-
-        // score height ratio
-        var scoreSize = this.layers.ring.node().getBBox().height/3.5;
-
+        // Draw the score itself
+        var scoreSize = this.layers.ring.node().getBBox().height/3.5;       // score height ratio
         this.overalltxt = this.layers.text.append('text')
             .attr('class','overall')
             .attr('font-size', scoreSize)
             .text(this.calculateHealthScore());
 
-
         // Center the score
         this.overalltxt
             .attr('x', - (this.overalltxt.node().getBBox().width / 2))
             .attr('dy', '0.5ex');
+
+        // Draw the help overlays
+
+        // 1. Lower layer
+        this.helpOverlayLower = d3.svg.arc()
+            .startAngle(0)
+            .endAngle(360)
+            .innerRadius(this.scale(-100))
+            .outerRadius(this.scale(this.healthRange.lower));
+
+        this.help = this.layers.help.append('path')
+            .attr('d', this.helpOverlayLower)
+            .classed('help',true)
+            .classed('visible', this.helpOverlays.lower.visible);
+        this.helpOverlays.lower.node = this.help;
+
+        // 2. Center layer
+        this.helpOverlayCenter = d3.svg.arc()
+            .startAngle(0)
+            .endAngle(360)
+            .innerRadius(this.scale(this.healthRange.lower))
+            .outerRadius(this.scale(this.healthRange.upper));
+
+        this.help = this.layers.help.append('path')
+            .attr('d', this.helpOverlayCenter)
+            .classed('help',true)
+            .classed('visible', this.helpOverlays.center.visible);
+        this.helpOverlays.center.node = this.help;
+
+        // 3. Upper layer
+        this.helpOverlayUpper = d3.svg.arc()
+            .startAngle(0)
+            .endAngle(360)
+            .innerRadius(this.scale(this.healthRange.upper))
+            .outerRadius(this.scale(100));
+
+        this.help = this.layers.help.append('path')
+            .attr('d', this.helpOverlayUpper)
+            .classed('help',true)
+            .classed('visible', this.helpOverlays.upper.visible);
+        this.helpOverlays.upper.node = this.help;
 
         // Figure out how many points there should be
         this.primaryIncrement = 360 / this.userdata.factors.length || 1;
@@ -493,8 +538,20 @@
                 that.zoomOut();
             }
         });
+    };
 
-
+    /**
+     * Function: HGraph.toggleHelpOverlayVisibility
+     *    toggle help overlay visibility
+     *
+     * Arguments:
+     *      overlay - *(String)* The name of the help overlay
+     *      visibility - *(Boolean)* The desired visibility. Defaults to toggling if ommitted.
+     */
+    HGraph.prototype.toggleHelpOverlayVisibility = function(overlay, visibility) {
+        var visible = visibility || !this.helpOverlays[overlay].visible;
+        this.helpOverlays[overlay].visible = visible;
+        this.helpOverlays[overlay].node.classed('visible', visible);
     };
 
     /**
