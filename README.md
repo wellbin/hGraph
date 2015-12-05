@@ -79,14 +79,17 @@ The help layer contains several overlays, each intented to highligh a section of
 
 #####Available options:
  
-Option Name | Type | Description
+Option Name | Type | Description | Default
 --- | --- | ---
-**axisTicks** | *Array[Number]* | the (absolute) scores where a radial tick should be drawn. Defaults to `[-100, -65, -30, 0, 30, 65, 100]`.
-**axisLabelRotaion** | *Number* | the rotation (in degrees) of the polar axis labels. Defaults to `15`.
-**axisPolarStep** | *Number* | the step (in degrees) of the polar axis lines. Defaults to `30`.
-**axisPolarRotation** | *Number* | the rotation (in degrees) of the polar axis lines. Defaults to `0`.
-**axisPolarLabelsVisible** | *Boolean* | whether to display the polar end labels. Defaults to `false`.
-**layersVisibleAtStartup** | *Array[String]* | which layers to display at startup. Defaults to `['ring', 'web', 'text', 'datapoints']`.
+showLabels | *Boolean* | whether to show the labels of the datapoints. | `false`
+showHealthyRangeValues | *Boolean* | whether to show the healthy ranges of the datapoints. | `false`
+axisTicks | *Array[Number]* | the (absolute) scores where a radial tick should be drawn. | `[-100, -65, -30, 0, 30, 65, 100]`
+axisLabelRotaion | *Number* | the rotation (in degrees) of the polar axis labels. | `15`
+axisPolarStep | *Number* | the step (in degrees) of the polar axis lines. | `30`
+axisPolarRotation | *Number* | the rotation (in degrees) of the polar axis lines. | `0`
+axisPolarLabelsVisible | *Boolean* | whether to display the polar end labels. | `false`
+layersVisibleAtStartup | *Array[String]* | which layers to display at startup. | `['ring', 'web', 'text', 'datapoints']`
+
 
 
 ###Want to Contribute? Here is how you can help###

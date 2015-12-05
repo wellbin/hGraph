@@ -103,7 +103,8 @@
         this.userdata         = opts.userdata || {};
         this.primaryIncrement = 1;
 
-        this.showLabels   = opts.showLabels || false;
+        this.showLabels = opts.showLabels || false;
+        this.showHealthyRangeValues = opts.showHealthyRangeValues || false;
         this.isZoomed     = false;
 
         this.x = 0;
@@ -114,13 +115,16 @@
             x : 0,
             y : 0
         };
-        this.layers       = {
-            ring       : null,
-            web        : null,
-            text       : null,
-            datapoints : null,
-            help       : null,
-            axis      : null
+
+        // The layers
+        this.layers = {
+            ring: null,
+            web: null,
+            text: null,
+            datapoints: null,
+            help: null,
+            axis: null,
+            healthyrange: null
         };
 
         // Help overlays
@@ -301,7 +305,7 @@
      */
     HGraph.prototype.initialize = function() {
 
-        var layer, i, datapoint, web, touchstart, movedelta, that;
+        var layer, i, datapoint, touchstart, movedelta, that;
 
         that = this;
 
@@ -446,12 +450,18 @@
             this.addPoint(datapoint, i);
         }
 
+        // *************************************************************************************************************
+        // * Web
+        // *************************************************************************************************************
+        var webLayer = this.layers.web;
+
         // Create a web path and hook it up
-        web = this.layers.web.append('path');
-        this.updateWeb(false);
+        var web = webLayer.append('path');
         web
             .attr('data-originalPath', web.attr('d'))
             .classed('web',true);
+
+        this.updateWeb(false);
 
 
         // Set up the dragability of the zoomed in graph
@@ -1047,7 +1057,7 @@
         };
 
         scaledDataValue = this.scale(datapoint.score);
-        if ( secondary ) {
+        if (secondary) {
             scoreDiff = startingScoreRange[1] - startingScoreRange[0];
             interstitialScore = startingScoreRange[0] + ((scoreDiff / steps) * index);
             startingDataValue = this.scale(interstitialScore);
@@ -1058,7 +1068,7 @@
 
         radian = angle * (Math.PI / 180);
 
-        if ( startingDataValue ) {
+        if (startingDataValue) {
             startingCoords = {
                 x : (Math.cos(radian) * startingDataValue).toFixed(1),
                 y : (Math.sin(radian) * startingDataValue).toFixed(1)
@@ -1083,22 +1093,41 @@
             .attr('data-sortindex', typeof sortIndex === 'number' ? sortIndex + '.' + index : index)
             .classed(getPointColor.call(this, scaledDataValue), true);
 
+        // Show healthy range values
+        if (datapoint.healthyRange) {
+            var r = this.scale,
+                healthyRangeLayer = this.layers.healthyrange;
+            var hr = healthyRangeLayer.append("g")
+                .attr("class", "r axis")
+                .selectAll("g")
+                .data(datapoint.healthyRange)
+                .enter().append("g");
+
+            hr.append("text")
+                .attr("y", function(d) { return -r(d.score); })
+                .attr("dy", "0.5ex")
+                .attr("text-anchor", "middle")
+                .attr("transform", "rotate(" + (datapoint.angle - this.rotation) + ")")
+                .classed("healthy", true)
+                .text(function(d) { return d.value; });
+        }
+
         // allow point and zoom if graph is zoomable
-        if(this.zoomable) {
+        if (this.zoomable) {
             point.on("click", clicked);
             point.classed("clickable", true);
         }
 
-        if ( startingCoords ) {
+        if (startingCoords) {
             point.attr('data-startingCoords', JSON.stringify(startingCoords));
         }
 
         // Note the secondary class as such
-        if ( secondary ) {
+        if (secondary) {
             point.classed('secondary', true);
         }
 
-        if ( this.showLabels ) {
+        if (this.showLabels) {
             // Calculate the size of the datapoint radius (clamping it between 1 and 10)
             labelPointScale = Math.max(scaledDataValue + (radius * 3), this.scale(50));
             // Do the labels.
@@ -1115,7 +1144,7 @@
 
             metricValue = datapoint.value || 100-Math.abs(datapoint.score);
 
-            label = this.layers.datapoints.append('text')
+            var label = this.layers.datapoints.append('text')
                 .text(datapoint.label + (labelWithDetail ? ' (' + metricValue + ')' : ''))
                 .data([datapoint.score])
                 .attr('class', 'label')
@@ -1128,17 +1157,17 @@
                 .classed(getPointColor.call(this, scaledDataValue), true);
 
             // allow point and zoom if graph is zoomable
-            if(this.zoomable) {
+            if (this.zoomable) {
                 label.on("click", clicked);
                 label.classed("clickable", true);
             }
 
-            if ( secondary ) {
+            if (secondary) {
                 label.classed('secondary', true);
             }
 
             // Hook up a link if it's there.
-            if ( datapoint.link ) {
+            if (datapoint.link) {
                 point
                     .attr('href', datapoint.link)
                     .classed('linked', true)
