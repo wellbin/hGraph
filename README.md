@@ -54,6 +54,41 @@ During a `window.onload` or similar entry point, the health graph is constructed
         }
 
 
+##hGraph and hScore
+
+###hGraph
+
+####Layers
+The graph is organized with several layers which show different types of information:
+
+* `ring`: the ring that highlights the healthy sector of the graph.
+* `web`: the *web* that connects the points in the graph.
+* `text`: the text for the hScore.
+* `datapoints`: the datapoints and their labels.
+* `help`: visual helpers to explain how the graph works.
+* `axis`: radial and polar axis of the graph.
+
+#####Help Layer
+The help layer contains several overlays, each intented to highligh a section of the graph's scale:
+
+* `lower`: below healthy range. 
+* `healthy`: healthy range. 
+* `upper`: healthy range. 
+
+####Options
+
+#####Available options:
+ 
+Option Name | Type | Description
+--- | --- | ---
+**axisTicks** | *Array[Number]* | the (absolute) scores where a radial tick should be drawn. Defaults to `[-100, -65, -30, 0, 30, 65, 100]`.
+**axisLabelRotaion** | *Number* | the rotation (in degrees) of the polar axis labels. Defaults to `15`.
+**axisPolarStep** | *Number* | the step (in degrees) of the polar axis lines. Defaults to `30`.
+**axisPolarRotation** | *Number* | the rotation (in degrees) of the polar axis lines. Defaults to `0`.
+**axisPolarLabelsVisible** | *Boolean* | whether to display the polar end labels. Defaults to `false`.
+**layersVisibleAtStartup** | *Array[String]* | which layers to display at startup. Defaults to `['ring', 'web', 'text', 'datapoints']`.
+
+
 ###Want to Contribute? Here is how you can help###
 For designers and engineers:
 * What's version 2 of hGraph?

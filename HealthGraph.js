@@ -66,6 +66,16 @@
         opts.features.totalRange = opts.features.totalRange || 'totalrange';
         this.features = opts.features;
 
+        // Layer options
+        this.layersVisibleAtStartup = opts.layersVisibleAtStartup || ['ring', 'web', 'text', 'datapoints'];
+
+        // Axis options
+        this.axisTicks = opts.axisTicks || [-100, -65, -30, 0, 30, 65, 100];
+        this.axisLabelRotation = opts.axisLabelRotation || 15;
+        this.axisPolarStep = opts.axisPolarStep || 30;
+        this.axisPolarRotation = opts.axisPolarRotation || 0;
+        this.axisPolarLabelsVisible = false;
+
         // enables/disables zooming
         this.zoomable = opts.zoomable || false;
 
@@ -109,16 +119,17 @@
             web        : null,
             text       : null,
             datapoints : null,
-            help       : null
+            help       : null,
+            axis      : null
         };
 
-        // Help overlays visibility
+        // Help overlays
         this.helpOverlays = {
             lower: {
                 node: null,
                 visible: false
             },
-            center: {
+            healthy: {
                 node: null,
                 visible: false
             },
@@ -126,7 +137,9 @@
                 node: null,
                 visible: false
             }
-        }
+        };
+
+
     };
 
 
@@ -300,15 +313,15 @@
             .attr('width',this.width).attr('height',this.height);
 
         // Set up the layers
-        for ( layer in this.layers ) {
+        for(layer in this.layers ) {
             if (this.layers.hasOwnProperty(layer)) {
                 this.layers[layer] = this.context.append('g')
-                    .attr('class','layer')
                     .attr('data-layername', layer)
+                    .classed('layer', true)
+                    .classed('visible', this.layersVisibleAtStartup.indexOf(layer) >= 0)
                     .attr('transform', this.center);
             }
         }
-
 
         // Draw the ring around the user's health score
         this.ringpath = d3.svg.arc()
@@ -319,29 +332,31 @@
 
         this.ring = this.layers.ring.append('path').attr('d', this.ringpath).classed('ring',true);
 
-        // Draw the score itself
-        var scoreSize = this.layers.ring.node().getBBox().height/3.5;       // score height ratio
-        this.overalltxt = this.layers.text.append('text')
+        // *************************************************************************************************************
+        // * Text layer
+        // *************************************************************************************************************
+        var textLayer = this.layers.text;
+
+        var scoreText = textLayer.append('text')
             .attr('class','overall')
-            .attr('font-size', scoreSize)
+            .attr("text-anchor", "middle")
+            .attr('dy', '0.5ex')
+            .attr('dx', this.x)
             .text(this.calculateHealthScore());
 
-        // Center the score
-        this.overalltxt
-            .attr('x', - (this.overalltxt.node().getBBox().width / 2))
-            .attr('dy', '0.5ex');
+        // *************************************************************************************************************
+        // * Help layer
+        // *************************************************************************************************************
+        var helpLayer = this.layers.help;
 
-        // Draw the help overlays
-
-        // 1. Lower layer
-        this.helpOverlayLower = d3.svg.arc()
+        var lowerOverlay = d3.svg.arc()
             .startAngle(0)
             .endAngle(360)
             .innerRadius(this.scale(-100))
             .outerRadius(this.scale(this.healthRange.lower));
 
-        this.help = this.layers.help.append('path')
-            .attr('d', this.helpOverlayLower)
+        this.help = helpLayer.append('path')
+            .attr('d', lowerOverlay)
             .classed('help',true)
             .classed('visible', this.helpOverlays.lower.visible);
         this.helpOverlays.lower.node = this.help;
@@ -353,11 +368,11 @@
             .innerRadius(this.scale(this.healthRange.lower))
             .outerRadius(this.scale(this.healthRange.upper));
 
-        this.help = this.layers.help.append('path')
+        this.help = helpLayer.append('path')
             .attr('d', this.helpOverlayCenter)
             .classed('help',true)
-            .classed('visible', this.helpOverlays.center.visible);
-        this.helpOverlays.center.node = this.help;
+            .classed('visible', this.helpOverlays.healthy.visible);
+        this.helpOverlays.healthy.node = this.help;
 
         // 3. Upper layer
         this.helpOverlayUpper = d3.svg.arc()
@@ -366,11 +381,59 @@
             .innerRadius(this.scale(this.healthRange.upper))
             .outerRadius(this.scale(100));
 
-        this.help = this.layers.help.append('path')
+        this.help = helpLayer.append('path')
             .attr('d', this.helpOverlayUpper)
             .classed('help',true)
             .classed('visible', this.helpOverlays.upper.visible);
         this.helpOverlays.upper.node = this.help;
+
+        // *************************************************************************************************************
+        // Axis
+        // *************************************************************************************************************
+        var r = this.scale,
+            axisLayer = this.layers.axis,
+            that = this;
+
+        // Radial axis
+        var gr = axisLayer.append("g")
+            .attr("class", "r axis")
+            .selectAll("g")
+            .data(this.axisTicks)
+            .enter().append("g");
+
+        gr.append("circle")
+            .attr("r", r);
+
+        gr.append("text")
+            .attr("y", function(d) { return -r(d); })
+            .attr("dy", "-0.5ex")
+            .attr("transform", "rotate(" + this.axisLabelRotation + ")")
+            .style("text-anchor", "middle")
+            .text(function(d) { return 100 - Math.abs(d); });
+
+        // Polar axis
+        var ga = axisLayer.append("g")
+            .attr("class", "a axis")
+            .selectAll("g")
+            .data(d3.range(0, 360, this.axisPolarStep))
+            .enter().append("g")
+            .attr("transform", function(d) { return "rotate(" + (-d + that.axisPolarRotation) + ")"; });
+
+        ga.append("line")
+            .attr("x2", r(100));
+
+        ga.append("text")
+            .attr("x", r(100) + 6)
+            .attr("dy", ".35em")
+            .style("text-anchor", function(d) { return d < 270 && d > 90 ? "end" : null; })
+            .attr("transform", function(d) { return d < 270 && d > 90 ? "rotate(180 " + (r(100) + 6) + ",0)" : null; })
+            .attr("visibility", this.axisPolarLabelsVisible ? "visible" : "hidden")
+            .text(function(d) { return d + "°"; });
+
+
+        // *************************************************************************************************************
+        // * Datapoints
+        // *************************************************************************************************************
 
         // Figure out how many points there should be
         this.primaryIncrement = 360 / this.userdata.factors.length || 1;
@@ -542,16 +605,30 @@
 
     /**
      * Function: HGraph.toggleHelpOverlayVisibility
-     *    toggle help overlay visibility
+     *      toggles help overlay visibility
      *
      * Arguments:
      *      overlay - *(String)* The name of the help overlay
-     *      visibility - *(Boolean)* The desired visibility. Defaults to toggling if ommitted.
+     *      visibility - *(Boolean)* The desired visibility. Defaults to toggling if omitted.
      */
     HGraph.prototype.toggleHelpOverlayVisibility = function(overlay, visibility) {
         var visible = visibility || !this.helpOverlays[overlay].visible;
         this.helpOverlays[overlay].visible = visible;
         this.helpOverlays[overlay].node.classed('visible', visible);
+    };
+
+    /**
+     * Function: HGraph.toggleLayerVisibility
+     *      toggles layer visibility
+     *
+     * Arguments:
+     *      layer - *(String)* The name of the layer
+     *      visibility - *(Boolean)* The desired visibility. Defaults to toggling if omitted.
+     */
+    HGraph.prototype.toggleLayerVisibility = function(layer, visibility) {
+        var targetLayer = this.layers[layer];
+        var visible = visibility || !targetLayer.classed('visible');
+        targetLayer.classed('visible', visible);
     };
 
     /**
