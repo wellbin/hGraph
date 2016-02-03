@@ -1085,12 +1085,13 @@
 
         radius = Math.max(1, Math.min(10, Math.round(this.width / 80)));
         point = this.layers.datapoints.append('circle')
-            .data([datapoint.score])
+            .data([datapoint])
             .attr('r', secondary ? radius / 1.5 : radius)
             .attr('cx', (startingCoords ? startingCoords.x : coords.x) * (this.isZoomedIn() ? this.zoomFactor : 1))
             .attr('cy', (startingCoords ? startingCoords.y : coords.y) * (this.isZoomedIn() ? this.zoomFactor : 1))
             .attr('data-origcoords', JSON.stringify(coords))
             .attr('data-sortindex', typeof sortIndex === 'number' ? sortIndex + '.' + index : index)
+            .attr('id', function(d) { return d.id })
             .classed(getPointColor.call(this, scaledDataValue), true);
 
         // Show healthy range values
