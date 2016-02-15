@@ -614,6 +614,19 @@
     };
 
     /**
+     * Function: HGraph.overlayVisibility
+     *      overlay visibility
+     *
+     * Arguments:
+     *      overlay - *(String)* The name of the help overlay
+     *      visibility - *(Boolean)* The desired visibility.
+     */
+    HGraph.prototype.overlayVisibility = function(overlay, visibility) {
+        this.helpOverlays[overlay].visible = visibility;
+        this.helpOverlays[overlay].node.classed('visible', visibility);
+    };
+
+    /**
      * Function: HGraph.toggleHelpOverlayVisibility
      *      toggles help overlay visibility
      *
