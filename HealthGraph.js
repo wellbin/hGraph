@@ -635,7 +635,7 @@
      *      visibility - *(Boolean)* The desired visibility. Defaults to toggling if omitted.
      */
     HGraph.prototype.toggleHelpOverlayVisibility = function(overlay, visibility) {
-        var visible = visibility || !this.helpOverlays[overlay].visible;
+        var visible = visibility === undefined ? !this.helpOverlays[overlay].visible : visibility;
         this.helpOverlays[overlay].visible = visible;
         this.helpOverlays[overlay].node.classed('visible', visible);
     };
