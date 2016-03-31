@@ -59,6 +59,15 @@
             lower : -30,
             upper : 30
         };
+        this.tooltip          = {};
+        this.tooltip.opts     = {
+            padding: 20,
+            minWidth: 100,
+            width: opts.tooltip.width || 100,
+            height: opts.tooltip.height || 50,
+            x: 0,
+            y: 0
+        };
 
         // Features property names
         opts.features = opts.features || {};
@@ -124,7 +133,8 @@
             datapoints: null,
             help: null,
             axis: null,
-            healthyrange: null
+            healthyrange: null,
+            tooltips: null
         };
 
         // Help overlays
@@ -611,6 +621,8 @@
                 that.zoomOut();
             }
         });
+
+
     };
 
     /**
@@ -1033,7 +1045,7 @@
      */
     HGraph.prototype.addPoint = function(datapoint, index, startingAngle, increment, steps, startingScoreRange, sortIndex, labelWithDetail) {
 
-        var point, secondary, angle, radian, coords, radius, getPointColor, getTextAnchor, gotoPage, interstitialScore, startingDataValue, startingCoords, scoreDiff, scaledDataValue, labelPointScale, metricValue;
+        var point, secondary, angle, radian, coords, radius, getPointColor, getTextAnchor, gotoPage, interstitialScore, startingDataValue, startingCoords, scoreDiff, scaledDataValue, labelPointScale, metricValue, tooltip, tooltipOpts;
 
         var self = this;
 
@@ -1097,6 +1109,7 @@
         datapoint.coords = coords;
 
         radius = Math.max(1, Math.min(10, Math.round(this.width / 80)));
+
         point = this.layers.datapoints.append('circle')
             .data([datapoint])
             .attr('r', secondary ? radius / 1.5 : radius)
@@ -1106,6 +1119,85 @@
             .attr('data-sortindex', typeof sortIndex === 'number' ? sortIndex + '.' + index : index)
             .attr('id', function(d) { return d.id })
             .classed(getPointColor.call(this, scaledDataValue), true);
+
+        // Tooltip
+        tooltipOpts = this.tooltip.opts;
+        tooltipOpts.x = (startingCoords ? startingCoords.x : coords.x) * (this.isZoomedIn() ? this.zoomFactor : 1);
+        tooltipOpts.y = (startingCoords ? startingCoords.y : coords.y) * (this.isZoomedIn() ? this.zoomFactor : 1);
+
+        tooltip = this.layers.tooltips.append('g')
+            .data([datapoint])
+            .attr("x", tooltipOpts.x)
+            .attr("y", tooltipOpts.y)
+            .attr('class', 'tooltip')
+            .attr('id', function(d) { return d.id })
+            .style("opacity", 0);
+
+        tooltip.append('rect')
+            .data([datapoint])
+            .attr("x", tooltipOpts.x - 25)
+            .attr("y", tooltipOpts.y - 88)
+            .attr("width", 50)
+            .attr("height", 75)
+            .style("fill", '#F3F3F3')
+            .style("stroke", '#CCC');
+
+        tooltip.append('text')
+            .data([datapoint])
+            .attr("x", tooltipOpts.x)
+            .attr("y", tooltipOpts.y - 25)
+            .text(function(d) { return d.label })
+            .attr('id', 'label')
+            .attr('fill', '#0E2932')
+            .attr('font-size', '14px');
+
+        tooltip.append('text')
+            .data([datapoint])
+            .attr("x", tooltipOpts.x)
+            .attr("y", tooltipOpts.y - 45)
+            .attr("text-anchor", "middle")
+            .text(function(d) { return Math.floor(d.value) })
+            .attr('id', 'value')
+            .attr('fill', '#0E2932')
+            .attr('font-size', '40px');
+
+
+        // Absolute Centering Tooltip
+        tooltip.attr('data-width', function () {
+            tooltipOpts.width = this.querySelector('text').getBBox().width;
+            return tooltipOpts.width;
+        });
+
+        tooltip.selectAll('rect')
+            .style("width", function() {
+                var res;
+
+                if (tooltipOpts.width > tooltipOpts.minWidth) {
+                    tooltipOpts.width = tooltipOpts.width + tooltipOpts.padding;
+                    tooltipOpts.realWidth = tooltipOpts.width;
+                    res = tooltipOpts.width;
+
+                } else {
+                    res = tooltipOpts.minWidth;
+                    tooltipOpts.realWidth = tooltipOpts.width;
+                    tooltipOpts.width = tooltipOpts.minWidth;
+                }
+
+                return res;
+            })
+            .attr('x', function () {
+                return tooltipOpts.x - (tooltipOpts.width / 2);
+            });
+
+        tooltip.selectAll('#label').attr("x", function() {
+            return (tooltipOpts.width > tooltipOpts.minWidth) ? (tooltipOpts.x - (tooltipOpts.realWidth / 2) + (tooltipOpts.padding / 2)) : (tooltipOpts.x - (tooltipOpts.realWidth / 2));
+        });
+
+        point.on('mouseover', function(d) {
+            tooltip.style("opacity", 0.9);
+        }).on('mouseout', function() {
+            tooltip.style("opacity", 0);
+        });
 
         // Show healthy range values
         if (datapoint.healthyRange) {
