@@ -1045,7 +1045,7 @@
      */
     HGraph.prototype.addPoint = function(datapoint, index, startingAngle, increment, steps, startingScoreRange, sortIndex, labelWithDetail) {
 
-        var point, secondary, angle, radian, coords, radius, getPointColor, getTextAnchor, gotoPage, interstitialScore, startingDataValue, startingCoords, scoreDiff, scaledDataValue, labelPointScale, metricValue, tooltip, tooltipOpts;
+        var point, secondary, angle, radian, coords, radius, getPointColor, getTextAnchor, getTextAlign, getTextXCoord, gotoPage, interstitialScore, startingDataValue, startingCoords, scoreDiff, scaledDataValue, labelPointScale, metricValue, tooltip, tooltipOpts;
 
         var self = this;
 
@@ -1062,9 +1062,26 @@
             if ( x >= -10 && x <= 10) {
                 return 'middle';
             } else {
-                return ( x > 0) ? 'start' : 'end';
+                return (x > 0) ? 'start' : 'end';
             }
+        };
 
+        getTextAlign = function(x) {
+            x = parseInt(x, 10);
+            if ( x >= -10 && x <= 10) {
+                return 'center';
+            } else {
+                return (x > 0) ? 'left' : 'right';
+            }
+        };
+
+        getTextXCoord = function(x, labelBoxWidth) {
+            x = parseInt(x, 10);
+            if ( x >= -10 && x <= 10) {
+                return x-labelBoxWidth/2;
+            } else {
+                return (x > 0) ? x : x - labelBoxWidth;
+            }
         };
 
         gotoPage = function() {
@@ -1236,6 +1253,7 @@
         if (this.showLabels) {
             // Calculate the size of the datapoint radius (clamping it between 1 and 10)
             labelPointScale = Math.max(scaledDataValue + (radius * 3), this.scale(50));
+
             // Do the labels.
             labelCoords = {
                 x : (Math.cos(radian) * labelPointScale).toFixed(1),
@@ -1250,16 +1268,23 @@
 
             metricValue = datapoint.value || 100-Math.abs(datapoint.score);
 
-            var label = this.layers.datapoints.append('text')
+            var labelBoxWidth = 100,
+                labelBoxHeight = 40;
+
+            var label = this.layers.datapoints.append('foreignObject')
                 .text(datapoint.label + (labelWithDetail ? ' (' + metricValue + ')' : ''))
                 .data([datapoint.score])
                 .attr('class', 'label')
-                .attr('x', labelCoords.x)
-                .attr('y', labelCoords.y)
+                .attr('x', getTextXCoord(labelCoords.x, labelBoxWidth))
+                .attr('y', labelCoords.y + 2*radius)
+                .attr('width', labelBoxWidth)
+                .attr('height', labelBoxHeight)
+                .attr('border', 'solid 1px')
                 .attr('data-origcoords', JSON.stringify(labelCoords))
                 .attr('data-metricValue', datapoint.details ? '' : metricValue)
-                .attr('text-anchor', getTextAnchor(coords.x))
+                // .attr('text-anchor', getTextAnchor(coords.x))
                 .attr('data-sortindex', typeof sortIndex === 'number' ? sortIndex + '.' + index : index)
+                .style('text-align', getTextAlign(coords.x))
                 .classed(getPointColor.call(this, scaledDataValue), true);
 
             // allow point and zoom if graph is zoomable
