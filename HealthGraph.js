@@ -63,6 +63,7 @@
         this.tooltip.opts     = {
             padding: 20,
             minWidth: 100,
+            radius: opts.tooltip.radius || 4,
             width: opts.tooltip.width || 100,
             height: opts.tooltip.height || 50,
             x: 0,
@@ -1139,6 +1140,8 @@
             .attr("y", tooltipOpts.y - 88)
             .attr("width", 50)
             .attr("height", 75)
+            .attr("rx", tooltipOpts.radius)
+            .attr("ry", tooltipOpts.radius)
             .style("fill", '#F3F3F3')
             .style("stroke", '#CCC');
 
@@ -1156,7 +1159,7 @@
             .attr("x", tooltipOpts.x)
             .attr("y", tooltipOpts.y - 45)
             .attr("text-anchor", "middle")
-            .text(function(d) { return Math.floor(d.value) })
+            .text(function(d) {return Number(parseFloat(d.value).toFixed(2)) })
             .attr('id', 'value')
             .attr('fill', '#0E2932')
             .attr('font-size', '40px');
