@@ -350,14 +350,14 @@
         // *************************************************************************************************************
         // * Text layer
         // *************************************************************************************************************
-        var textLayer = this.layers.text;
-
-        var scoreText = textLayer.append('text')
-            .attr('class','overall')
-            .attr("text-anchor", "middle")
-            .attr('dy', '0.5ex')
-            .attr('dx', this.x)
-            .text(this.calculateHealthScore());
+        // var textLayer = this.layers.text;
+        //
+        // var scoreText = textLayer.append('text')
+        //     .attr('class','overall')
+        //     .attr("text-anchor", "middle")
+        //     .attr('dy', '0.5ex')
+        //     .attr('dx', this.x)
+        //     .text(this.calculateHealthScore());
 
         // *************************************************************************************************************
         // * Help layer
