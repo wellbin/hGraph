@@ -1,0 +1,43 @@
+{
+  "name": "antena-hGraph",
+  "version": "1.1.11",
+  "authors": [
+    "Gonzalo Bellver <gonzalo@antena.co>"
+  ],
+  "maintainers": [
+    "Denise Fernandez <denise@antena.co>",
+    "Gonzalo Bellver <gonzalo@antena.co>"
+  ],
+  "description": "An open source javascript-based web application for visualizing health data",
+  "homepage": "https://github.com/Antena/hGraph",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Antena/hGraph"
+  },
+  "bugs": {
+    "url": "https://github.com/Antena/hGraph/issues"
+  },
+  "main": "HealthGraph.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "health",
+    "data",
+    "visualization",
+    "open",
+    "source"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "examples",
+    "lib",
+    "docs",
+    "serverstart.sh"
+  ],
+  "dependencies": {
+    "d3": "~3.5.6",
+    "jquery": "~2.1.4"
+  }
+}
