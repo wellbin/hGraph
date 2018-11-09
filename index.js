@@ -7,7 +7,8 @@ var hammer = require('hammerjs');
  *      Sets up new HGraph instances
  */
 var HGraph = function(opts) {
-    this.container        = opts.container || null;
+	opts                  = opts || { tooltip: {}, features: {} };
+	this.container        = opts.container || null;
     this.context          = null;
     this.width            = opts.width || 0;
     this.height           = opts.height || 0;
@@ -634,27 +635,57 @@ HGraph.prototype.toggleLayerVisibility = function(layer, visibility) {
  *      myValue - *(number)* Number to compare to features
  */
 HGraph.prototype.calculateScoreFromValue = function (features, myValue){
+    var PERFECT_SCORE = 0;
+	var BORDER_UP_SCORE = 25;
+	var BORDER_DOWN_SCORE = -25;
+    var WORST_UP_SCORE = 100;
+    var WORST_DOWN_SCORE = -100;
+
     var maxHealthyValue = features[this.features.healthyRange][1];
     var minHealthyValue = features[this.features.healthyRange][0];
-    var maxAcceptableValue = features[this.features.totalRange][1];
-    var minAcceptableValue = features[this.features.totalRange][0];
-    var healthyRangeMidPoint = (minHealthyValue + maxHealthyValue)/2.0;
-    var score = 0;
+    var score = PERFECT_SCORE;
 
-    if ((myValue >= minHealthyValue)  && (myValue <= maxHealthyValue)){
-        if((minHealthyValue === minAcceptableValue && myValue < healthyRangeMidPoint) || (maxHealthyValue === maxAcceptableValue && myValue > healthyRangeMidPoint) || (myValue == healthyRangeMidPoint)){
-            score = 0;
-        } else {
-            score = 30 * ((myValue - healthyRangeMidPoint)/(maxHealthyValue - healthyRangeMidPoint))
-        }
-    } else if (myValue > maxHealthyValue){
-        score = 70 * ((myValue-maxHealthyValue)/(maxAcceptableValue-maxHealthyValue)) + 30;
-        if(score > 100)
-            score = 100;
-    } else {
-        score = -(70 * ((minHealthyValue-myValue)/(minHealthyValue-minAcceptableValue)) + 30);
-        if (score < -100)
-            score = -100;
+	var noMax = (maxHealthyValue === null && minHealthyValue !== null);
+	var noMin = (maxHealthyValue !== null && minHealthyValue === null);
+
+	if (noMax || noMin) {
+		if (noMax) {
+			if (myValue === minHealthyValue) {
+				score = BORDER_DOWN_SCORE;
+			} else if (myValue > minHealthyValue) {
+				score = PERFECT_SCORE;
+			} else {
+				score = WORST_DOWN_SCORE / 2;
+			}
+		} else {
+			if (myValue === maxHealthyValue) {
+				score = BORDER_UP_SCORE;
+			} else if (myValue < maxHealthyValue) {
+				score = PERFECT_SCORE;
+			} else {
+				score = WORST_UP_SCORE / 2;
+			}
+		}
+	} else {
+		var maxAcceptableValue = features[this.features.totalRange][1];
+		var minAcceptableValue = features[this.features.totalRange][0];
+		var healthyRangeMidPoint = (minHealthyValue + maxHealthyValue)/2.0;
+
+		if ((myValue >= minHealthyValue)  && (myValue <= maxHealthyValue)){
+			if((minHealthyValue === minAcceptableValue && myValue < healthyRangeMidPoint) || (maxHealthyValue === maxAcceptableValue && myValue > healthyRangeMidPoint) || (myValue == healthyRangeMidPoint)){
+				score = 0;
+			} else {
+				score = 30 * ((myValue - healthyRangeMidPoint)/(maxHealthyValue - healthyRangeMidPoint))
+			}
+		} else if (myValue > maxHealthyValue){
+			score = 70 * ((myValue-maxHealthyValue)/(maxAcceptableValue-maxHealthyValue)) + 30;
+			if(score > WORST_UP_SCORE)
+				score = WORST_UP_SCORE;
+		} else {
+			score = -(70 * ((minHealthyValue-myValue)/(minHealthyValue-minAcceptableValue)) + 30);
+			if (score < WORST_DOWN_SCORE)
+				score = WORST_DOWN_SCORE;
+		}
     }
 
     return score;

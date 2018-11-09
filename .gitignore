@@ -1,4 +1,3 @@
-/.gitignore
 hMixer/hMixer.bbprojectd/Scratchpad.txt
 
 hMixer/hMixer.bbprojectd/Unix Worksheet.worksheet
@@ -6,6 +5,8 @@ hMixer/hMixer.bbprojectd/Unix Worksheet.worksheet
 hMixer/hMixer.bbprojectd/danielhadley.bbprojectsettings
 
 hMixer/hMixer.bbprojectd/project.bbprojectdata
+
+node_modules
 
 .swp
 .DS_Store

@@ -28,4 +28,5 @@ bin
 docs
 lib
 examples
+test
 serverstart.sh
