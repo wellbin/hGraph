@@ -1,5 +1,5 @@
 {
-  "name": "antena-hGraph",
+  "name": "@wellbin/antena-hgraph",
   "version": "1.2.1",
   "authors": [
     "Gonzalo Bellver <gonzalo@antena.co>"
@@ -9,13 +9,13 @@
     "Gonzalo Bellver <gonzalo@antena.co>"
   ],
   "description": "An open source javascript-based web application for visualizing health data",
-  "homepage": "https://github.com/Antena/hGraph",
+  "homepage": "https://github.com/wellbin/hGraph",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Antena/hGraph"
+    "url": "https://github.com/wellbin/hGraph"
   },
   "bugs": {
-    "url": "https://github.com/Antena/hGraph/issues"
+    "url": "https://github.com/wellbin/hGraph/issues"
   },
   "main": "index.js",
   "moduleType": [
